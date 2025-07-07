@@ -1,0 +1,50 @@
+### CREATE Exponat mit Quiz
+POST http://localhost:8080/exponate
+Content-Type: application/json
+
+{
+  "titel": "Exponat C",
+  "beschreibung": "Beschreibung zu Exponat C",
+  "ausstellung": "Ausstellung 2",
+  "videoUrl": "https://beispiel.de/video.mp4",
+  "bildUrls": ["https://beispiel.de/bild1.jpg", "https://beispiel.de/bild2.jpg"],
+  "quiz": [
+    {
+      "frage": "Was ist die Hauptstadt von Frankreich?",
+      "antwort": "Paris",
+      "options": ["Paris", "Berlin", "Rom", "Madrid"]
+    },
+    {
+      "frage": "Was ist die Hauptstadt von Deutschland?",
+      "antwort": "Berlin",
+      "options": ["Paris", "Rom", "Madrid"]
+    }
+  ]
+}
+
+
+### READ alle Exponate
+GET http://localhost:8080/exponate
+
+### READ ein Exponat nach ID
+GET http://localhost:8080/exponate/685005c8dd959535c5e63088
+
+### UPDATE ein Exponat nach ID
+PUT http://localhost:8080/exponate/685005c8dd959535c5e63088
+Content-Type: application/json
+
+{
+  "titel": "Geändertes Exponat B",
+  "beschreibung": "Neue Beschreibung B",
+  "ausstellung": "Ausstellung 2",
+  "videoUrl": "https://beispiel.de/video_neu.mp4",
+  "bildUrls": ["https://beispiel.de/bild3.jpg"],
+  "quiz": {
+    "frage": "Was ist 2 + 2?",
+    "antwort": "4",
+    "options": ["3", "4", "5"]
+  }
+}
+
+### DELETE ein Exponat nach ID
+DELETE http://localhost:8080/exponate/685005c8dd959535c5e63088
