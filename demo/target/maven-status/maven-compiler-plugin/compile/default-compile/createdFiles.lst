@@ -10,7 +10,6 @@ com\fokuswissen\user\verification\VerificationToken.class
 com\fokuswissen\user\UserRepository.class
 com\fokuswissen\user\mail\MailService.class
 com\fokuswissen\user\UserService.class
-com\fokuswissen\config\WebConfig.class
 com\fokuswissen\Main.class
 com\fokuswissen\vuforia\VuforiaClient.class
 com\fokuswissen\exponat\Exponat.class

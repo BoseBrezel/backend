@@ -54,7 +54,7 @@ public class ExponatService
             exponat.setTitel(updatedExponat.getTitel());
             exponat.setScanBild(updatedExponat.getScanBild());
             exponat.setBeschreibung(updatedExponat.getBeschreibung());
-            exponat.setAusstellung(updatedExponat.getAusstellung());
+            exponat.setAusstellungsIds(updatedExponat.getAusstellungsIds());
             exponat.setVideoUrl(updatedExponat.getVideoUrl());
             exponat.setBildUrls(updatedExponat.getBildUrls());
             exponat.setQuiz(updatedExponat.getQuiz());

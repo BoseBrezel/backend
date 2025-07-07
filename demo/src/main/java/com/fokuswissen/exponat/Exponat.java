@@ -16,12 +16,12 @@ public class Exponat
 
     private String titel;
     private String beschreibung;
-    private String ausstellung;
     private String scanBild;
     private String videoUrl;
-    private ArrayList<String> bildUrls;
 
-    private ArrayList<Quiz> quiz;
+    private ArrayList<String> ausstellungsIds = new ArrayList<>();
+    private ArrayList<String> bildUrls = new ArrayList<>();
+    private ArrayList<Quiz> quiz = new ArrayList<>();
 
 
     public String getId()
@@ -63,14 +63,13 @@ public class Exponat
         this.beschreibung = beschreibung;
     }
 
-    public String getAusstellung()
-    {
-        return ausstellung;
+
+    public ArrayList<String> getAusstellungsIds() {
+        return ausstellungsIds;
     }
 
-    public void setAusstellung(String ausstellung)
-    {
-        this.ausstellung = ausstellung;
+    public void setAusstellungsIds(ArrayList<String> ausstellungsIds) {
+        this.ausstellungsIds = ausstellungsIds;
     }
 
     public String getVideoUrl()

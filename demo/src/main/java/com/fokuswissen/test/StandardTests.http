@@ -1,5 +1,5 @@
 ### CREATE Exponat mit Quiz
-POST http://localhost:8080/exponate
+POST https://localhost:8080/exponate
 Content-Type: application/json
 
 {
@@ -48,3 +48,15 @@ Content-Type: application/json
 
 ### DELETE ein Exponat nach ID
 DELETE http://localhost:8080/exponate/685005c8dd959535c5e63088
+
+
+###
+POST https://localhost:8080/users/register/email
+Content-Type: application/json
+
+{
+  "username": "Neuer",
+  "emailAdress": "lata221117@gmail.com",
+  "password": "123",
+  "roles": []
+}

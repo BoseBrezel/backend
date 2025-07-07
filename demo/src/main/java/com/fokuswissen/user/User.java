@@ -9,12 +9,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import lombok.Builder;
 
 @Builder
-public class User implements UserDetails {
-
+public class User implements UserDetails
+{
     @Id
     private String id;
     private String username;
@@ -94,8 +93,17 @@ public class User implements UserDetails {
     }
 
     public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
+        if (roles == null)
+        {
+            this.roles = new HashSet<>();
+            this.roles.add(UserRole.ROLE_USER);
+        }
+        else
+        {
+            this.roles = roles;
+        }
     }
+
 
     // USERDETAILS METHODS
 

@@ -1,8 +1,10 @@
 package com.fokuswissen.user;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import com.fokuswissen.user.mail.MailService;
 import com.fokuswissen.user.verification.VerificationToken;
 import com.fokuswissen.user.verification.VerificationTokenRepository;
+
+import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class UserService implements UserDetailsService
@@ -72,22 +76,26 @@ public class UserService implements UserDetailsService
         }
 
     //Registrierung nur mit nicht vergebenem Username und nicht vergebener Email
-    public User register(String username,String email, String password) {
+    public User register(String username, String email, String password) {
         if(userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username bereits vergeben");
         }
         if(userRepository.existsByEmailAdress(email)) {
             throw new IllegalArgumentException("Email-Adresse bereits vergeben");
         }
-
+        Set<UserRole> roles = new HashSet<>();
+        roles.add(UserRole.ROLE_USER);
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         User user = User.builder()
             .username(username)
             .emailAdress(email)
             .password(hash)
             .enabled(true)
+            .points("0") // default Punkte
+            .quizDone(List.of()) // leere Liste
+            .roles(roles)
             .build();
-        user.getRoles().add(UserRole.ROLE_USER);
+        System.out.println("user " + user);
         User savedUser = userRepository.save(user);
 
         return savedUser;
@@ -103,14 +111,18 @@ public class UserService implements UserDetailsService
         {
             throw new IllegalArgumentException("Email-Adresse bereits vergeben");
         }
+        Set<UserRole> roles = new HashSet<>();
+        roles.add(UserRole.ROLE_USER);
 
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         User user = User.builder()
             .username(username)
             .emailAdress(email)
             .password(hash)
+            .points("0")
+            .quizDone(List.of())
+            .roles(roles)
             .build();
-        user.getRoles().add(UserRole.ROLE_USER);
         User savedUser = userRepository.save(user);
 
         // Token erzeugen und speichern
@@ -145,34 +157,37 @@ public class UserService implements UserDetailsService
         userRepository.deleteById(id);
     }
     
-    public User updateUser(String id, String username, String email, String password)
-    {
+    public User updateUser(String id, String username, String email, String password, String points, List<String> quizDone) {
         return userRepository.findById(id).map(user -> {
-            if (username != null && !username.isEmpty() && !username.equals(user.getUsername()))
-            {
-                if (userRepository.existsByUsername(username))
-                {
+            if (username != null && !username.isEmpty() && !username.equals(user.getUsername())) {
+                if (userRepository.existsByUsername(username)) {
                     throw new IllegalArgumentException("Benutzername ist bereits vergeben");
                 }
                 user.setUsername(username);
             }
 
-            if (email != null && !email.isEmpty() && !email.equals(user.getEmailAdress()))
-            {
+            if (email != null && !email.isEmpty() && !email.equals(user.getEmailAdress())) {
                 if (userRepository.existsByEmailAdress(email)) {
                     throw new IllegalArgumentException("E-Mail-Adresse ist bereits vergeben");
                 }
                 user.setEmailAdress(email);
             }
 
-            if (password != null && !password.isEmpty())
-            {
+            if (password != null && !password.isEmpty()) {
                 String hash = BCrypt.hashpw(password, BCrypt.gensalt());
                 user.setPassword(hash);
             }
+
+            if(points != null) {
+                user.setPoints(points);
+            }
+
+            if(quizDone != null) {
+                user.setQuizDone(quizDone);
+            }
+
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }
-
 }
     

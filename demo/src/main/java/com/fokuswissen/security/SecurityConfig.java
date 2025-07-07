@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fokuswissen.user.UserRepository;
 
@@ -20,41 +22,35 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableMethodSecurity
-public class SecurityConfig
-{
+public class SecurityConfig implements WebMvcConfigurer {
+
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
-    public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepository)
-    {
+    public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
     }
-
+    
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
-    {
-        JwtFilter jwtFilter = new JwtFilter(jwtUtil, userRepository); //eignen Filter instanziieren
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // JwtFilter jwtFilter = new JwtFilter(jwtUtil, userRepository); // Kann entfernt werden, wenn keine Auth mehr
 
         return http
-                .csrf(csrf -> csrf.disable()) //Deaktivieren braucht man bei Session Cookie
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> {})
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(handling -> handling //Fehlerbehandlung
+                .exceptionHandling(handling -> handling
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                         }))
-                .authorizeHttpRequests(auth -> auth //Zugriffregelung /auth/** , /users/register und /news/** für alle zugänglich und email verify durchlassen
-                                .requestMatchers("/users/register").permitAll()
-                                .requestMatchers("/users/register/email").permitAll()
-                                .requestMatchers("/users/verify").permitAll()
-                                .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/news/**").permitAll()
-                                .anyRequest().authenticated() //andere Anfragen werden authentiziert
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()   // Alle Anfragen ohne Auth erlauben
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Entfernt, da nicht benötigt
                 .build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -63,10 +59,14 @@ public class SecurityConfig
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        
-        //Verknüpfe CORS-Konfiguration mit allen Pfaden (/**)
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/media/**").addResourceLocations("file:uploads/");
     }
 }

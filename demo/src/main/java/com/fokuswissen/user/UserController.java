@@ -88,7 +88,14 @@ public class UserController
         }
 
         try {
-            User updatedUser = userService.updateUser(id, user.getUsername(), user.getEmailAdress(), user.getPassword());
+            User updatedUser = userService.updateUser(
+                id,
+                user.getUsername(),
+                user.getEmailAdress(),
+                user.getPassword(),
+                user.getPoints(),
+                user.getQuizDone()
+            );
 
             // Prüfen, ob Username geändert wurde
             boolean usernameChanged = !existingUser.getUsername().equals(updatedUser.getUsername());
@@ -96,7 +103,6 @@ public class UserController
             if (usernameChanged) {
                 String newToken = jwtUtil.generateToken(updatedUser.getUsername(), updatedUser.getRoles(), updatedUser.getId());
 
-                // Token im Header zurückgeben
                 return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + newToken)
                     .body(updatedUser);
@@ -107,6 +113,7 @@ public class UserController
             return ResponseEntity.notFound().build();
         }
     }
+
 
 
     @DeleteMapping("/{id}")
